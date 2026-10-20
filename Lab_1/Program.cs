@@ -47,22 +47,37 @@ internal class Program
         string json = File.ReadAllText(DataInPath);
         Gramatica gramatica = JsonSerializer.Deserialize<Gramatica>(json);
 
-        Console.WriteLine(gramatica.ToString());
-        Console.WriteLine();
-        Console.WriteLine("Apasa S pentru derivare extrem stanga; D pentru derivare extrem dreapta");
+        Console.WriteLine(gramatica + "\n\nApasa S pentru derivare extrem stanga; D pentru derivare extrem dreapta");
 
-        var derivare = Console.ReadKey();
-        Console.WriteLine();
-        
-        switch (derivare.Key)
+        while (true)
         {
-            case ConsoleKey.S: gramatica.TipDerivare = TipDerivare.ExtremStanga;
-                break;
-            case ConsoleKey.D: gramatica.TipDerivare = TipDerivare.ExtremDreapta;
-                break;
-        }
+            var derivare = Console.ReadKey();
 
-        string sir = gramatica.Start;
+            if (derivare.Key == ConsoleKey.D)
+            {
+                gramatica.TipDerivare = TipDerivare.ExtremDreapta;
+                break;
+            }
+
+            if (derivare.Key == ConsoleKey.S)
+            {
+                gramatica.TipDerivare = TipDerivare.ExtremStanga;
+                break;
+            }
+        }
+        
+        Console.WriteLine("\n\nSiruri generate:\n");
+
+        for (int i = 0; i < 10; i++)
+        {
+            var sir = DeriveazaSir(gramatica.Start, gramatica);
+            
+            Console.WriteLine(sir.Length == 0 ? "Sirul vid" : sir);
+        }
+    }
+
+    private static string DeriveazaSir(string sir, Gramatica gramatica)
+    {
         while (true)
         {
             if (sir.Length > LungimeMaxSir || !ContineNeterminale(sir, gramatica))
@@ -109,7 +124,7 @@ internal class Program
             }
         }
         
-        Console.WriteLine(sir.Length == 0 ? "Sirul vid" : $"Sirul generat: {sir}");
+        return sir;
     }
 
     private static bool ContineNeterminale(string sir, Gramatica gramatica)

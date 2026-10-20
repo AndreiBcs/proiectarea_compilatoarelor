@@ -7,7 +7,7 @@
     "A": ["bA", "b"]
   }
 }
-Exemple de șiruri finale posibile: ab, abb, abbb, abbbb.
+Exemple de siruri finale posibile: ab, abb, abbb, abbbb.
 
 
 {
@@ -20,7 +20,7 @@ Exemple de șiruri finale posibile: ab, abb, abbb, abbbb.
     "B": ["b", "bb"]
   }
 }
-Exemple de șiruri finale posibile: ab, abb, aab, aabb, c, aaabb.
+Exemple de siruri finale posibile: ab, abb, aab, aabb, c, aaabb.
 
 
 {
@@ -32,7 +32,7 @@ Exemple de șiruri finale posibile: ab, abb, aab, aabb, c, aaabb.
     "A": ["bA", "λ"]
   }
 }
-Exemple de șiruri finale posibile: a, ab, abb, abbb.
+Exemple de siruri finale posibile: a, ab, abb, abbb.
 
 
 {
@@ -43,7 +43,7 @@ Exemple de șiruri finale posibile: a, ab, abb, abbb.
     "S": ["(S)S", "λ"]
   }
 }
-Exemple de șiruri finale posibile: șirul vid, (), ()(), (()), (()()).
+Exemple de siruri finale posibile: sirul vid, (), ()(), (()), (()()).
 
 
 {
