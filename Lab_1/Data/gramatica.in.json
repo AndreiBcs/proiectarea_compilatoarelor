@@ -1,8 +1,10 @@
 ﻿{
-  "Neterminale": ["S"],
-  "Terminale": ["(", ")"],
-  "Start": "S",
+  "Neterminale": ["E", "T", "F"],
+  "Terminale": ["a", "+", "*", "(", ")"],
+  "Start": "E",
   "Productii": {
-    "S": ["(S)S", "λ"]
+    "E": ["E+T", "T"],
+    "T": ["T*F", "F"],
+    "F": ["a", "(E)"]
   }
 }
