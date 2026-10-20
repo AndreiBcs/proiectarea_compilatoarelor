@@ -3,21 +3,23 @@ using System.Text.Json;
 
 namespace Lab_1;
 
-internal struct Gramatica
+internal enum TipDerivare
 {
-    public TipDerivare TipDerivare { get; set; }
-    public List<string> Neterminale { get; init; }
-    public List<string> Terminale { get; init; }
-    public string Start { get; init; }
-    public Dictionary<string, List<string>> Productii { get; init; }
+    ExtremStanga,
+    ExtremDreapta
+}
+
+internal class Gramatica
+{
+    public List<string> Neterminale { get; init; } = new();
+    public List<string> Terminale { get; init; } = new();
+    public string Start { get; init; } = "";
+    public Dictionary<string, List<string>> Productii { get; init; } = new();
     public override string ToString()
     {
-        string neterminale = string.Join(", ", Neterminale);
-        string terminale = string.Join(", ", Terminale);
-    
         var sb = new StringBuilder();
-        sb.AppendLine($"Neterminale: {neterminale}");
-        sb.AppendLine($"Terminale: {terminale}");
+        sb.AppendLine($"Neterminale: {string.Join(", ", Neterminale)}");
+        sb.AppendLine($"Terminale: {string.Join(", ", Terminale)}");
         sb.AppendLine($"Start: {Start}");
         sb.Append("Productii: ");
 
@@ -30,123 +32,115 @@ internal struct Gramatica
     }
 }
 
-internal enum TipDerivare
-{
-    ExtremStanga,
-    ExtremDreapta
-}
-
 internal class Program
 {
     private const string DataInPath = "Data/gramatica.in.json";
     private const string SirVid = "λ";
     private const int LungimeMaxSir = 60;
+    private const int NumarSiruri = 10;
     
-    public static void Main(string[] args)
+    public static void Main()
     {
-        string json = File.ReadAllText(DataInPath);
-        Gramatica gramatica = JsonSerializer.Deserialize<Gramatica>(json);
+        var gramatica = JsonSerializer.Deserialize<Gramatica>(File.ReadAllText(DataInPath));
 
         Console.WriteLine(gramatica + "\n\nApasa S pentru derivare extrem stanga; D pentru derivare extrem dreapta");
 
-        while (true)
-        {
-            var derivare = Console.ReadKey();
-
-            if (derivare.Key == ConsoleKey.D)
-            {
-                gramatica.TipDerivare = TipDerivare.ExtremDreapta;
-                break;
-            }
-
-            if (derivare.Key == ConsoleKey.S)
-            {
-                gramatica.TipDerivare = TipDerivare.ExtremStanga;
-                break;
-            }
-        }
+        var tip = CitesteTipDerivare();
         
         Console.WriteLine("\n\nSiruri generate:\n");
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < NumarSiruri; i++)
         {
-            var sir = DeriveazaSir(gramatica.Start, gramatica);
-            
-            Console.WriteLine(sir.Length == 0 ? "Sirul vid" : sir);
+            if (gramatica != null)
+            {
+                Console.WriteLine(Deriveaza(gramatica, tip));
+            }
         }
     }
 
-    private static string DeriveazaSir(string sir, Gramatica gramatica)
+    private static TipDerivare CitesteTipDerivare()
     {
         while (true)
         {
-            if (sir.Length > LungimeMaxSir || !ContineNeterminale(sir, gramatica))
-            {
-                break;
-            }
-
-            switch (gramatica.TipDerivare)
-            {
-                case TipDerivare.ExtremStanga:
-                {
-                    for (int i = 0; i < sir.Length; i++)
-                    {
-                        if (gramatica.Neterminale.Contains(sir[i].ToString()))
-                        {
-                            var productie = AlegeProductia(
-                                sir[i].ToString(),
-                                gramatica.Productii);
-
-                            sir = sir.Replace(sir[i].ToString(), productie);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-                case TipDerivare.ExtremDreapta:
-                {
-                    for (int i = sir.Length - 1; i >= 0; i--)
-                    {
-                        if (gramatica.Neterminale.Contains(sir[i].ToString()))
-                        {
-                            var productie = AlegeProductia(
-                                sir[i].ToString(),
-                                gramatica.Productii);
-
-                            sir = sir.Replace(sir[i].ToString(), productie);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-            }
+            var tasta = Console.ReadKey().Key;
+ 
+            if (tasta == ConsoleKey.S)
+                return TipDerivare.ExtremStanga;
+ 
+            if (tasta == ConsoleKey.D)
+                return TipDerivare.ExtremDreapta;
         }
-        
-        return sir;
     }
-
-    private static bool ContineNeterminale(string sir, Gramatica gramatica)
+    
+    private static string Deriveaza(Gramatica gramatica, TipDerivare tip)
     {
-        foreach (var neterminal in gramatica.Neterminale) 
+        var sir = gramatica.Start;
+ 
+        while (sir.Length <= LungimeMaxSir)
         {
-            if (sir.Contains(neterminal))
+            var neterminale = GasesteNeterminale(sir, gramatica);
+ 
+            // sirul contine doar terminale
+            if (neterminale.Count == 0)
+                return sir == "" ? SirVid : sir;
+ 
+            var ales = tip == TipDerivare.ExtremStanga
+                ? neterminale[0]
+                : neterminale[neterminale.Count - 1];
+ 
+            if (!gramatica.Productii.TryGetValue(ales.Nume, out var variante) || variante.Count == 0)
+                return sir + " (oprit: neterminal fara productii)";
+ 
+            var productie = variante[Random.Shared.Next(variante.Count)];
+            if (productie == SirVid)
+                productie = "";
+ 
+            sir = sir.Remove(ales.Pozitie, ales.Nume.Length).Insert(ales.Pozitie, productie);
+        }
+ 
+        // lungime > 60 (sirul inca mai contine neterminale)
+        return sir + " (oprit: lungime > 60)";
+    }
+ 
+    // returneaza toate neterminalele din sir, de la stanga la dreapta,
+    // impreuna cu pozitia la care apar
+    private static List<(int Pozitie, string Nume)> GasesteNeterminale(string sir, Gramatica gramatica)
+    {
+        var gasite = new List<(int Pozitie, string Nume)>();
+        var index = 0;
+ 
+        while (index < sir.Length)
+        {
+            var nume = NeterminalLa(sir, index, gramatica);
+ 
+            if (nume == "")
             {
-                return true;
+                index++;
+            }
+            else
+            {
+                gasite.Add((index, nume));
+                index += nume.Length;
             }
         }
-        return false;
+ 
+        return gasite;
     }
-
-    private static string AlegeProductia(
-        string neterminal,
-        Dictionary<string, List<string>> productii)
+ 
+    // daca la pozitia data incepe un neterminal, il returneaza (cel mai lung posibil), altfel returneaza ""
+    private static string NeterminalLa(string sir, int pozitie, Gramatica gramatica)
     {
-        var randomKey = Random.Shared.Next(0, productii[neterminal].Count);
-        
-        return productii[neterminal][randomKey] == SirVid 
-            ? "" 
-            : productii[neterminal][randomKey];
+        var rezultat = "";
+ 
+        foreach (var neterminal in gramatica.Neterminale)
+        {
+            if (neterminal.Length > rezultat.Length &&
+                sir.Substring(pozitie).StartsWith(neterminal, StringComparison.Ordinal))
+            {
+                rezultat = neterminal;
+            }
+        }
+ 
+        return rezultat;
     }
 }
