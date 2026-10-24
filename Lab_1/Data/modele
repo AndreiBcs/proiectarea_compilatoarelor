@@ -57,18 +57,3 @@ Exemple de siruri finale posibile: sirul vid, (), ()(), (()), (()()).
   }
 }
 Exemple de expresii finale posibile: a, a+a, a*a, a+a*a, (a+a)*a.
-
-
-{
-  "Neterminale": ["E", "E1", "T", "T1", "F"],
-  "Terminale": ["a", "+", "*", "(", ")"],
-  "Start": "E",
-  "Productii": {
-    "E": ["TE1"],
-    "E1": ["+TE1", "λ"],
-    "T": ["FT1"],
-    "T1": ["*FT1", "λ"],
-    "F": ["a", "(E)"]
-  }
-}
-Exemple de expresii finale posibile: a, a+a, a*a, a+a*a, (a+a)*a.

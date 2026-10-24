@@ -3,12 +3,6 @@ using System.Text.Json;
 
 namespace Lab_1;
 
-internal enum TipDerivare
-{
-    ExtremStanga,
-    ExtremDreapta
-}
-
 internal class Gramatica
 {
     public List<string> Neterminale { get; init; } = new();
@@ -21,11 +15,11 @@ internal class Gramatica
         sb.AppendLine($"Neterminale: {string.Join(", ", Neterminale)}");
         sb.AppendLine($"Terminale: {string.Join(", ", Terminale)}");
         sb.AppendLine($"Start: {Start}");
-        sb.Append("Productii: ");
+        sb.AppendLine("Productii: ");
 
         foreach (var kvp in Productii)
         {
-            sb.Append($"{kvp.Key} -> {string.Join(" | ", kvp.Value)}; ");
+            sb.AppendLine($"{kvp.Key} -> {string.Join(" | ", kvp.Value)}");
         }
     
         return sb.ToString();
@@ -41,25 +35,38 @@ internal class Program
     
     public static void Main()
     {
-        var gramatica = JsonSerializer.Deserialize<Gramatica>(File.ReadAllText(DataInPath));
-
+        var gramatica = JsonSerializer.Deserialize<Gramatica>(File.ReadAllText(DataInPath))!;
+        
         Console.WriteLine(gramatica + "\n\nApasa S pentru derivare extrem stanga; D pentru derivare extrem dreapta");
 
-        var tip = CitesteTipDerivare();
-        
+        var tipDerivare = CitesteTipDerivare();
+
         Console.WriteLine("\n\nSiruri generate:\n");
 
         for (var i = 0; i < NumarSiruri; i++)
         {
-            if (gramatica != null)
-            {
-                Console.WriteLine(Deriveaza(gramatica, tip));
-            }
+            Console.WriteLine(Deriveaza(gramatica, tipDerivare));
+        }
+    }
+    
+    private static TipDerivare CitesteTipDerivare()
+    {
+        while (true)
+        {
+            var tasta = Console.ReadKey(true).Key;
+ 
+            if (tasta == ConsoleKey.S)
+                return TipDerivare.ExtremStanga;
+ 
+            if (tasta == ConsoleKey.D)
+                return TipDerivare.ExtremDreapta;
         }
     }
 
-    private static TipDerivare CitesteTipDerivare()
+    private static string Deriveaza(Gramatica gramatica, TipDerivare tipDerivare)
     {
+        var sir = gramatica.Start;
+        
         while (true)
         {
             var tasta = Console.ReadKey().Key;
@@ -117,14 +124,49 @@ internal class Program
             {
                 index++;
             }
-            else
+
+            switch (tipDerivare)
             {
-                gasite.Add((index, nume));
-                index += nume.Length;
+                case TipDerivare.ExtremStanga:
+                {
+                    for (var i = 0; i < sir.Length; i++)
+                    {
+                        if (gramatica.Neterminale.Contains(sir[i].ToString()))
+                        {
+                            var productie = AlegeProductia(
+                                sir[i].ToString(),
+                                gramatica.Productii);
+
+                            sir = sir.Remove(i, 1);
+                            sir = sir.Insert(i, productie);
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+                case TipDerivare.ExtremDreapta:
+                {
+                    for (var i = sir.Length - 1; i >= 0; i--)
+                    {
+                        if (gramatica.Neterminale.Contains(sir[i].ToString()))
+                        {
+                            var productie = AlegeProductia(
+                                sir[i].ToString(),
+                                gramatica.Productii);
+
+                            sir = sir.Remove(i, 1);
+                            sir = sir.Insert(i, productie);
+                            break;
+                        }
+                    }
+
+                    break;
+                }
             }
         }
- 
-        return gasite;
+        
+        return sir.Length == 0 ? "sir vid" : sir;
     }
  
     // daca la pozitia data incepe un neterminal, il returneaza (cel mai lung posibil), altfel returneaza ""
