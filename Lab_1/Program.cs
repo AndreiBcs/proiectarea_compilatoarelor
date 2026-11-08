@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Lab_1;
 
-internal class Gramatica
+public class Gramatica
 {
     public List<string> Neterminale { get; init; } = new();
     public List<string> Terminale { get; init; } = new();
