@@ -3,11 +3,11 @@ namespace Lab_2;
 
 internal class ProductieLR
 {
-    public int Numar { get; private init; }
-    public string Stanga { get; private init; } = "";
-    public List<string> Dreapta { get; private init; } = new();
+    public int Numar { get; init; }
+    public string Stanga { get; init; } = "";
+    public List<string> Dreapta { get; init; } = new();
 
-    public static List<ProductieLR> GetProdctii()
+    public static List<ProductieLR> GetProductii()
     {
         return
         [
@@ -171,20 +171,27 @@ internal class Program
         }
 
         var intrare = inputLine.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        
         intrare.Add("$");
 
-        var pozitie = 0;
-        var productii = ProductieLR.GetProdctii();
+        var pozitieIntrare = 0;
+        var productii = ProductieLR.GetProductii();
 
         while (true)
         {
+            if (pozitieIntrare >= intrare.Count)
+            {
+                Console.WriteLine("eroare: s-a terminat sirul de intrare");
+                return;
+            }
+            
             var stareCurenta = stiva.Peek().Stare;
-            var simbolCurent = intrare[pozitie];
+            var simbolCurent = intrare[pozitieIntrare];
             
             if (!TA.TryGetValue(stareCurenta, out var value) 
                 || !value.ContainsKey(simbolCurent))
             {
-                Console.WriteLine("sirul este respins");
+                Console.WriteLine("eroare: sintaxa invalida");
                 return;
             }
 
@@ -206,38 +213,38 @@ internal class Program
                     Stare = stareNoua
                 });
                 
-                pozitie++;
+                pozitieIntrare++;
                 Console.WriteLine($"deplasare ({actiune}): s-a pus '{simbolCurent}' cu starea {stareNoua} pe stiva");
             }
             else if (actiune.StartsWith('r'))
             {
                 var numarProductie = int.Parse(actiune[1..]);
-                var prod = productii.First(p => p.Numar == numarProductie);
+                var productie = productii.First(p => p.Numar == numarProductie);
 
-                var elementeDeSters = prod.Dreapta.Count;
+                var elementeDeSters = productie.Dreapta.Count;
 
                 for (var i = 0; i < elementeDeSters; i++)
                 {
                     stiva.Pop();
                 }
-
+                
                 var stareAnterioara = stiva.Peek().Stare;
 
                 if (!TS.TryGetValue(stareAnterioara, out var value1) ||
-                    !value1.TryGetValue(prod.Stanga, out var stareSalt))
+                    !value1.TryGetValue(productie.Stanga, out var stareSalt))
                 {
-                    Console.WriteLine($"eroare în TS pentru starea {stareAnterioara} si neterminalul {prod.Stanga}");
+                    Console.WriteLine($"eroare în TS pentru starea {stareAnterioara} si neterminalul {productie.Stanga}");
                     return;
                 }
 
                 stiva.Push(new ElementStiva
                 {
-                    Simbol = prod.Stanga,
+                    Simbol = productie.Stanga,
                     Stare = stareSalt
                 });
 
-                Console.WriteLine($"reducere ({actiune}): s-a aplicat {prod.Stanga} -> " +
-                                  $"{string.Join("", prod.Dreapta)}, salt la starea {stareSalt}");
+                Console.WriteLine($"reducere ({actiune}): s-a aplicat {productie.Stanga} -> " +
+                                  $"{string.Join("", productie.Dreapta)}, salt la starea {stareSalt}");
             }
         }
     }
