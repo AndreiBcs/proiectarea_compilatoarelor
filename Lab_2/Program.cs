@@ -29,8 +29,129 @@ internal class ElementStiva
 
 internal class Program
 {
-    private Dictionary<int, Dictionary<string, string>> TA = new ();
-    private Dictionary<int, Dictionary<string, int>> TS = new();
+    private Dictionary<int, Dictionary<string, string>> TA = new()
+    {
+        { 0, new Dictionary<string, string>
+            {
+                { "id", "d5" },
+                { "(", "d4" }
+            }
+        },
+        { 1, new Dictionary<string, string>
+            {
+                { "+", "d6" },
+                { "$", "acc" }
+            }
+        },
+        { 2, new Dictionary<string, string>
+            {
+                { "+", "r2" },
+                { "*", "d7" },
+                { ")", "r2" },
+                { "$", "r2" }
+            }
+        },
+        { 3, new Dictionary<string, string>
+            {
+                { "+", "r4" },
+                { "*", "r4" },
+                { ")", "r4" },
+                { "$", "r4" }
+            }
+        },
+        { 4, new Dictionary<string, string>
+            {
+                { "id", "d5" },
+                { "(", "d4" }
+            }
+        },
+        { 5, new Dictionary<string, string>
+            {
+                { "+", "r6" },
+                { "*", "r6" },
+                { ")", "r6" },
+                { "$", "r6" }
+            }
+        },
+        { 6, new Dictionary<string, string>
+            {
+                { "id", "d5" },
+                { "(", "d4" }
+            }
+        },
+        { 7, new Dictionary<string, string>
+            {
+                { "id", "d5" },
+                { "(", "d4" }
+            }
+        },
+        { 8, new Dictionary<string, string>
+            {
+                { "+", "d6" },
+                { ")", "d11" }
+            }
+        },
+        { 9, new Dictionary<string, string>
+            {
+                { "+", "r1" },
+                { "*", "d7" },
+                { ")", "r1" },
+                { "$", "r1" }
+            }
+        },
+        { 10, new Dictionary<string, string>
+            {
+                { "+", "r3" },
+                { "*", "r3" },
+                { ")", "r3" },
+                { "$", "r3" }
+            }
+        },
+        { 11, new Dictionary<string, string>
+            {
+                { "+", "r5" },
+                { "*", "r5" },
+                { ")", "r5" },
+                { "$", "r5" }
+            }
+        }
+    };
+    private Dictionary<int, Dictionary<string, int>> TS = new()
+    {
+        { 0, new Dictionary<string, int>
+            {
+                { "E", 1 },
+                { "T", 2 },
+                { "F", 3 }
+            }
+        },
+        { 1, new Dictionary<string, int>() },
+        { 2, new Dictionary<string, int>() },
+        { 3, new Dictionary<string, int>() },
+        { 4, new Dictionary<string, int>
+            {
+                { "E", 8 },
+                { "T", 2 },
+                { "F", 3 }
+            }
+        },
+        { 5, new Dictionary<string, int>() },
+        { 6, new Dictionary<string, int>
+            {
+                { "T", 9 },
+                { "F", 3 }
+            }
+        },
+        { 7, new Dictionary<string, int>
+            {
+                { "F", 10 }
+            }
+        },
+        { 8, new Dictionary<string, int>() },
+        { 9, new Dictionary<string, int>() },
+        { 10, new Dictionary<string, int>() },
+        { 11, new Dictionary<string, int>() }
+    };
     
     private static void Main()
     {
