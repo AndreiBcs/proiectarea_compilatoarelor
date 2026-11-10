@@ -39,7 +39,7 @@ internal class Program
     private const int LungimeMaxSir = 60;
     private const int NumarSiruri = 10;
     
-    public static void Main()
+    private static void Main()
     {
         var gramatica = JsonSerializer.Deserialize<Gramatica>(File.ReadAllText(DataInPath))!;
         
